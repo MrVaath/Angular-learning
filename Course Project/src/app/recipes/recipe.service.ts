@@ -1,14 +1,17 @@
-import { Injectable } from "@angular/core";
+import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs/Subject';
 
 // Model
-import { Recipe } from "./recipe.model";
-import { Ingredient } from "../shared/ingredient.model";
+import { Recipe } from './recipe.model';
+import { Ingredient } from '../shared/ingredient.model';
 
 // Services
-import { ShoppingListService } from "../shopping-list/shopping-list.service";
+import { ShoppingListService } from '../shopping-list/shopping-list.service';
 
 @Injectable()
 export class RecipeService {
+
+    recipesChanged = new Subject<Recipe[]>();
 
     private recipes: Recipe[] = [
         new Recipe(
@@ -26,7 +29,7 @@ export class RecipeService {
             'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/NYC-Diner-Bacon-Cheeseburger.jpg/1024px-NYC-Diner-Bacon-Cheeseburger.jpg',
             [
                 new Ingredient('Buns', 2),
-                new Ingredient('Meat', 1)                
+                new Ingredient('Meat', 1)
             ]
         )
     ];
@@ -45,5 +48,20 @@ export class RecipeService {
 
     addIngredientsToShoppingList(ingredients: Ingredient[]) {
         this.slService.addIngredients(ingredients);
+    }
+
+    addRecipe(recipe: Recipe) {
+        this.recipes.push(recipe);
+        this.recipesChanged.next(this.recipes.slice());
+    }
+
+    updateRecipe(index: number, newRecipe: Recipe) {
+        this.recipes[index] = newRecipe;
+        this.recipesChanged.next(this.recipes.slice());
+    }
+
+    deleteRecipe(index: number) {
+        this.recipes.splice(index, 1);
+        this.recipesChanged.next(this.recipes.slice());
     }
 }
